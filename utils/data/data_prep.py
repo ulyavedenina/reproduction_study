@@ -25,8 +25,9 @@ class DataPreparation:
     def get_dataset(self, split='train', vision_model=None, vocab=None,
             tokens=None):
         
-        ## here the DatasetClass is replaced by the dataset eg : CocoDataset and the init function of CocoDataset is called.
-        # Load the dataset 
+        ## here the "dataset"_dataset.py is called and the dataset  is replaced by the dataset 
+        # eg : a3ds_dataset.py and the init function of a3ds is called.
+        # Load the dataset .
         dataset = self.DatasetClass()
         self.dataset = dataset
         return self.dataset

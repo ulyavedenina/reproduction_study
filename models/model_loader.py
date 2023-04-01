@@ -27,6 +27,7 @@ class ModelLoader:
         # Make sure dataset returns labels
         #self.dataset.set_label_usage(True)
         # GVE arguments
+        # Initialize some variables and then call the GVE class which contains the forward function, and the number of layers etc.
         embedding_size = self.args.embedding_size
         hidden_size = self.args.hidden_size
         vocab_size = len(self.dataset.vocab)
@@ -54,10 +55,11 @@ class ModelLoader:
 
 
     def sc(self):
-        # comment line 59 because I didnt implement the method.
+        # comment line 59 because we didnt implement the method.
         # Make sure dataset returns labels
         # self.dataset.set_label_usage(True)
         # Sentence classifier arguments
+        # Initialize some variables and then call the sentence_classifier class which contains the forward function, and the number of layers etc.
         embedding_size = self.args.embedding_size
         hidden_size = self.args.hidden_size
         vocab_size = len(self.dataset.vocab)

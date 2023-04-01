@@ -166,11 +166,18 @@ class CocoDataset(data.Dataset):
 
     def __getitem__(self, index):
         """Returns one data pair (image and caption)."""
+        # coco here is an instance of the pycocotools.coco.COCO class that represents the COCO annotation file for the dataset.
         coco = self.coco
         vocab = self.vocab
+        # ids is a list of annotation or image ids depending on the ids_based_on parameter
         base_id = self.ids[index]
         #caption = coco.anns[ann_id]['caption']
 
+        """The following is a conditional statement that checks if the ids_based_on instance variable of the 
+        CubDataset class is set to self.ID_BASE.CAPTIONS. If it is, then the ann_id variable is set to base_id 
+        and the img_id variable is set to the image_id of the annotation with ann_id. Otherwise, if ids_based_on 
+        is set to self.ID_BASE.IMAGES, then the img_id variable is set to base_id, and a random annotation 
+        id ann_id is selected from the annotations associated with the img_id."""
         if self.ids_based_on == self.ID_BASE.CAPTIONS:
             ann_id = base_id
             img_id = coco.anns[ann_id]['image_id']
@@ -184,7 +191,9 @@ class CocoDataset(data.Dataset):
         if self.return_labels:
             class_label = self.get_class_label(img_id)
 
+        # The tokens variable is set to the tokenized caption for the annotation with ann_id
         tokens = self.tokens[ann_id]
+        # The image variable is set to the image tensor for the img_id.
         image = self.get_image(img_id)
 
         """
@@ -193,8 +202,10 @@ class CocoDataset(data.Dataset):
         """
         caption = []
         caption.append(vocab(vocab.start_token))
+        # The word ids for the tokens in the caption are appended to the caption list using the vocabulary vocab
         caption.extend([vocab(token) for token in tokens])
         caption.append(vocab(vocab.end_token))
+        # The target variable is set to a tensor containing the word ids for the caption.
         target = torch.Tensor(caption)
         if self.return_labels:
              return image, target, base_id, class_label

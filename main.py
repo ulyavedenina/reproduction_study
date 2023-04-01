@@ -22,6 +22,7 @@ if __name__ == '__main__':
     # Print arguments
     utils.arg_parser.print_args(args)
 
+    # Set the device. If a gpu is availabe use it.
     device = torch.device('cuda:{}'.format(args.cuda_device) if
             torch.cuda.is_available() and not args.disable_cuda else 'cpu')
     print("Is there a graphic card? ", torch.cuda.is_available())
@@ -48,9 +49,10 @@ if __name__ == '__main__':
     ## call function get_split_str that returns train if the args.train is set to true 
     ## and test if the args.train is set to false AND the dataset is not coco. 
     split = get_split_str(args.train, bool(args.eval_ckpt), args.dataset)
-    ## DataPreparation class gets called. Init method sets the DatasetClass to the appropriate dataset class.
+    ## data_prep.py gets called. Init method sets the DatasetClass to the appropriate dataset class.
     data_prep = DataPreparation(args.dataset, args.data_path)
     ## get the dataset and the data loader (they differ depending on the args dataset given at the begining)
+    # Dataset is creating an python object of our dataset and Dataloader is an iterator over the dataset.
     dataset, data_loader = data_prep.get_dataset_and_loader(split, args.pretrained_model,
             batch_size=args.batch_size, num_workers=args.num_workers)
     if args.train:
@@ -63,7 +65,9 @@ if __name__ == '__main__':
     print()
 
     print("Loading Model ...")
-    ## create the model
+    ## create the model. Depending on what model will be trained or test other model 
+    # is created here. There model_loader.py is called for a sentence classifier object in our case
+    # and then for a gve object later on when we train the captioner.
     ml = ModelLoader(args, dataset)
     model = getattr(ml, args.model)()
     print(model, '\n')
@@ -72,7 +76,7 @@ if __name__ == '__main__':
     if not args.train:
         print("Loading Model Weights ...")
         ## if the main is called to test and not to train, we have to get the weights, this 
-        ## happens by loading the eval_ckpt(I guess here are the weights!). Torch.load is
+        ## happens by loading the eval_ckpt(here are the weights!). Torch.load is
         ## called to load an object that was saved with torch.save() from a file.
         evaluation_state_dict = torch.load(args.eval_ckpt)
         model_dict = model.state_dict(full_dict=True)
@@ -80,13 +84,14 @@ if __name__ == '__main__':
         model.load_state_dict(model_dict)
         model.eval()
 
+    # the following lines were commented out because we didnt implement the set_label_usage function in our dataset.
     # if args.train:
     #     val_dataset.set_label_usage(dataset.return_labels)
 
     # Create logger
     logger = Logger(os.path.join(job_path, 'logs'))
 
-    # Get trainer
+    # Get trainer, on this train_epoch() will be called.
     trainer_creator = getattr(TrainerLoader, args.model)
     trainer = trainer_creator(args, model, dataset, data_loader, logger, device)
     if args.train:
@@ -104,12 +109,17 @@ if __name__ == '__main__':
     max_score = 0
     while trainer.curr_epoch < args.num_epochs:
         if args.train:
+            # here the train_epoch() function of the model is called.
+            # if for example the model is a sentence_classifier, the function that is called is 
+            # located in the sentence_classifier_trainer.py file inside the train folder.
             trainer.train_epoch()
 
             # Eval & Checkpoint
+            # Create the file names for the checkpoints.
             checkpoint_name = "ckpt-e{}".format(trainer.curr_epoch)
             checkpoint_path = os.path.join(job_path, checkpoint_name)
 
+            # This part if for computing the best epoch so far(this is then saved on a file)
             model.eval()
             result = evaluator.train_epoch()
             if evaluator.REQ_EVAL:
@@ -121,7 +131,7 @@ if __name__ == '__main__':
             logger.scalar_summary('score', score, trainer.curr_epoch)
 
             # TODO: Eval model
-            # Save the models
+            # Save the model at the current epoch with the current weights.
             checkpoint = {'epoch': trainer.curr_epoch,
                           'max_score': max_score,
                           'optimizer' : trainer.optimizer.state_dict()}
@@ -129,7 +139,7 @@ if __name__ == '__main__':
             torch.save(model.state_dict(), checkpoint_path)
             torch.save(checkpoint, os.path.join(job_path,
                 "training_checkpoint.pth"))
-            # mexri edw trexei. 
+            # If the score is better create a link file that will link to the model with the best score.
             if score > max_score:
                 max_score = score
                 link_name = "best-ckpt.pth"
@@ -143,6 +153,7 @@ if __name__ == '__main__':
         else:
             result = trainer.train_epoch()
             if trainer.REQ_EVAL:
+                # Provide a file with results from the evaluation
                 score = dataset.eval(result, "results")
 
     if not args.train and args.model == 'sc':

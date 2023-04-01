@@ -49,9 +49,16 @@ class A3DSDataset(data.Dataset):
     def __len__(self):
         return len(self.images)    
     
-      
+
+    """ This function is defining the behavior of the object when an item is accessed by index."""  
     def __getitem__(self, index):
+        # Retrieve the image data associated with the specified index from the object's images attribute 
+        # and convert it to a PyTorch tensor using the torch.from_numpy() function. This allows the image
+        # data to be used with PyTorch's deep learning functionality.
         image = torch.from_numpy(self.images[index])
+        # Retrieve the label associated with the specified index from the object's labels attribute and convert
+        # it to a PyTorch tensor using the torch.tensor() function. This also allows the label to be used with PyTorch's deep
+        # learning functionality.
         label = torch.tensor(self.labels[index])
         # Check if caption exists for given index
         caption = self.captions.get(str(index), '')  
@@ -64,10 +71,13 @@ class A3DSDataset(data.Dataset):
 
     nlp = spacy.load('en_core_web_sm')
 
+    """This code defines a collate function for a PyTorch DataLoader. The purpose of this function
+    is to take a batch of data and organize it into a format that can be easily fed into a neural network."""
     def collate_fn(self, data):
         """Collate function to be used with DataLoader."""
-        # Sort data by caption length
+        # Sort the data by caption length in descending order, so that captions with similar lengths are grouped together.
         data.sort(key=lambda x: len(x[2]), reverse=True)
+        # Unzip the list of tuples into three separate lists: images, labels, and captions.
         images, labels, captions = zip(*data)
 
 
@@ -94,20 +104,23 @@ class A3DSDataset(data.Dataset):
         captions = [torch.tensor(caption[:-1]).clone().detach() for caption in captions]
         
 
-        # Pad sequences
+        # Pad the sequences of caption indices with the padding index so that they are all the same length.
         word_targets = pad_sequence(
             [torch.tensor(caption[:-1]) for caption in captions],
             batch_first=True,
             padding_value=self.pad_index
         )
-        # Sort lengths in descending order
+        # Sort the captions and lengths by length in descending order, so that they can be packed into 
+        # a PackedSequence object. This is an optimization that allows the model to skip over padded elements during training.
         lengths = torch.tensor([len(caption) - 1 for caption in captions])
         sorted_lengths, sorted_indices = torch.sort(lengths, descending=True)
         sorted_captions = [captions[i] for i in sorted_indices]
         sorted_word_targets = word_targets[sorted_indices]
 
         
-
+        # Convert the labels into a tensor.
         labels = torch.tensor(labels)
         
+        # Return the sorted_word_targets, sorted_lengths, and labels as a tuple. sorted_word_targets is a tensor of padded caption indices,
+        # sorted_lengths is a tensor of caption lengths in descending order, and labels is a tensor of image labels.
         return sorted_word_targets, sorted_lengths, labels

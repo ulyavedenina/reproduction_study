@@ -22,7 +22,7 @@ from .coco_dataset import CocoDataset
 class CubDataset(CocoDataset):
 
     """CUB Custom Dataset compatible with torch.utils.data.DataLoader."""
-    #Set variables that will later be needed, ie the path of the images, the path of the captions, the name of the 
+    # Set attributes that will later be needed, ie the path of the images, the path of the captions, the name of the 
     # vocab.
     dataset_prefix = 'cub'
     image_path = ''
@@ -40,6 +40,9 @@ class CubDataset(CocoDataset):
     # Available data splits (must contain 'train')
     DATA_SPLITS = set(['train', 'val', 'test'])
 
+    """The init function initializes an instance of the CubDataset class with the specified root directory, split (default is train), 
+    vocabulary, tokenized captions, transform, and flag indicating whether to use image features. 
+    It also calls the __init__() method of the parent class."""
     def __init__(self, root, split='train', vocab=None, tokenized_captions=None,
             transform=None, use_image_features=True):
         super().__init__(root, split, vocab, tokenized_captions, transform)
@@ -51,13 +54,14 @@ class CubDataset(CocoDataset):
             self.load_img_features(self.img_features_path)
             self.input_size = next(iter(self.img_features.values())).shape[0]
 
-
+    """This function loads image features from the specified file path."""
     def load_img_features(self, img_features_path):
         with open(img_features_path, 'rb') as f:
             feature_dict = pickle.load(f, encoding='latin1')
         self.img_features = feature_dict
 
 
+    """This function loads class labels from the specified file path."""
     def load_class_labels(self, class_labels_path):
         with open(class_labels_path, 'rb') as f:
             label_dict = pickle.load(f, encoding='latin1')
@@ -65,6 +69,7 @@ class CubDataset(CocoDataset):
         self.num_classes = len(set(label_dict.values()))
         self.class_labels = label_dict
 
+    """This function retrieves an image with the specified ID."""
     def get_image(self, img_id):
         if self.img_features is not None:
             image = self.img_features[img_id]
@@ -73,6 +78,7 @@ class CubDataset(CocoDataset):
             image = super().get_image(img_id)
         return image
 
+    """This function retrieves the class label for an image with the specified ID."""
     def get_class_label(self, img_id):
         class_label = torch.LongTensor([int(self.class_labels[img_id])-1])
         return class_label

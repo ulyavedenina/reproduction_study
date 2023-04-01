@@ -6,21 +6,21 @@ This repository contains the reproduction attempt of a [pragmatic model](https:/
 Following the repository (https://github.com/windweller/Pragmatic-ISIC), this implementation uses Python 3, PyTorch and pycocoevalcap.  
 All dependencies can be installed into a conda environment with the provided environment.yml file (original from Windweller and also dependencies needed to make the sentence classifier work).
 
-1.Clone the repository
+1. Clone the repository
 ```shell
 git clone https://github.com/ulyavedenina/reproduction_study.git
 cd reproduction_study
 ```
-2.Create conda environment
+2. Create conda environment
 ```shell
 conda env create -f environment.yml
 ```
-3.Activate environment
+3. Activate environment
 ```shell
 conda activate gve-lrcn
 ```
 
-4.Download pre-trained model and data
+4. Download pre-trained model and data
 ```bash
 sh rsa-file-setup.sh 
 ```

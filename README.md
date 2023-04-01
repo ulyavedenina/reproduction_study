@@ -30,9 +30,11 @@ sh rsa-file-setup.sh
 ```bash
 pip install -r requirements.txt
 ```
-Note: Most likely one must also run: ```bash
+Note: Most likely one must also run: 
+```bash
 python -m spacy download en
-``` to make the code work.
+``` 
+to make the code work.
 
 6. Download A3DS Dataset: Since the dataset is too big to upload in GitHub, one can download it by following the instructions here: 
 https://github.com/polina-tsvilodub/3dshapes-language . Before downloading the dataset, one must create a file data/A3DS in their reproduction_study repository. Note: we used the whole A3DS dataset and not only the sandbox.

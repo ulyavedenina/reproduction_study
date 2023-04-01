@@ -58,5 +58,6 @@ python main.py --model gve --dataset 3d --sc-ckpt ./data/3d/sentence_classifier_
 python main.py --model gve --dataset 3d --eval ./checkpoints/gve-3d-D<date>-T<time>-G<GPUid>/best-ckpt.pth
 ```
 
+NOTE: The original code from the Windweller repository and our replication code is only working on linux and Mac. Trying to make it run in windows is not recommended.
 
 

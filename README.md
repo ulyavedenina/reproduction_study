@@ -2,6 +2,8 @@
 
 This repository contains the reproduction attempt of a [pragmatic model](https://arxiv.org/abs/2004.14451) built by Nie et al. and its test on the A3DS data set. Both data sets (cub and A3DS) as well as the model training notebook (ran on a paid Google Colab runtime) and the final report are attached.
 
+Most of the following instructions were taken from https://github.com/windweller/Pragmatic-ISIC and https://github.com/salaniz/pytorch-gve-lrcn .
+
 ## Installation
 Following the repository (https://github.com/windweller/Pragmatic-ISIC), this implementation uses Python 3, PyTorch and pycocoevalcap.  
 All dependencies can be installed into a conda environment with the provided environment.yml file (original from Windweller and also dependencies needed to make the sentence classifier work).
@@ -60,4 +62,11 @@ python main.py --model gve --dataset 3d --eval ./checkpoints/gve-3d-D<date>-T<ti
 
 NOTE: The original code from the Windweller repository and our replication code is only working on linux and Mac. Trying to make it run in windows is not recommended.
 
+## Table of contents
 
+1. main.py: this is the first python code that is called. It contains the main function, the creation of a dataset and a dataloader object. It also creates a model and a trainer. 
+2. models folder: this folder contains definitions of the gve class, the lrcn class and also the sentence_classifier class amongst other classes.
+3. ResultsCUB folder: contains the results we obtained from evaluting the captioner on the CUB dataset.
+4. train folder: this folder contains the actual trainer code for each class. 
+5. utils folder: all other help functions and classes are located here. In the subfolder data one can find the classes for the different datasets.
+6. colabScript.ipynb: this is a script to run the code of the repository on google colab. It presupposes that the repository is uploaded on Google Drive(including the dataset)

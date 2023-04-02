@@ -70,3 +70,4 @@ NOTE: The original code from the Windweller repository and our replication code 
 4. train folder: this folder contains the actual trainer code for each class. 
 5. utils folder: all other help functions and classes are located here. In the subfolder data one can find the classes for the different datasets.
 6. colabScript.ipynb: this is a script to run the code of the repository on google colab. It presupposes that the repository is uploaded on Google Drive(including the dataset)
+7. Report: tbd
